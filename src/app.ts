@@ -1,6 +1,5 @@
-import express, { Express } from 'express';
-
 import { GatewayServer } from '@gateway/server';
+import express, { Express } from 'express';
 
 class Application {
   public initialize(): void {
@@ -9,6 +8,6 @@ class Application {
     server.start();
   }
 }
-
+ 
 const app: Application = new Application();
 app.initialize();

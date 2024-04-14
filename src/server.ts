@@ -11,6 +11,7 @@ import { Application, NextFunction, json, urlencoded, Request, Response } from '
 import compression from 'compression';
 import { StatusCodes } from 'http-status-codes';
 import { elasticSearch } from '@gateway/elasticsearch';
+import { appRoutes } from '@gateway/routes';
 
 const SERVER_PORT = 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
@@ -57,7 +58,9 @@ export class GatewayServer {
     app.use(urlencoded({ extended: true, limit: '200mb' }));
   }
 
-  private routesMiddleware(): void { }
+  private routesMiddleware(): void {
+    appRoutes(this.app);
+  }
 
   private startElasticSearch(): void {
     elasticSearch.checkConnection();

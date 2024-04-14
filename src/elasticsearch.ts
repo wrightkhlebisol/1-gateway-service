@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 
 const log: Logger = winstonLogger(
   `${config.ELASTIC_SEARCH_URL}`,
-  'notification-elastic-search-server',
+  'gateway-elastic-search-server',
   'debug',
 );
 

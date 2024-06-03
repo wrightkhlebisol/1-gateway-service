@@ -1,4 +1,5 @@
 import http from 'http';
+import 'express-async-errors';
 
 import { CustomError, IErrorResponse, winstonLogger } from '@wrightkhlebisol/jobber-shared';
 import { config } from '@gateway/config';
@@ -12,9 +13,10 @@ import compression from 'compression';
 import { StatusCodes } from 'http-status-codes';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
+import { isAxiosError } from 'axios';
+import { axiosAuthInstance } from '@gateway/services/api/auth.service';
 
-import { axiosAuthInstance } from './services/api/auth.service';
-
+const DEFAULT_ERROR_CODE = 500;
 const SERVER_PORT = 4000;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
 
@@ -78,14 +80,22 @@ export class GatewayServer {
     app.use('*', (req: Request, res: Response, next: NextFunction) => {
       const fullUrl: string = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
       log.log('error', `Route not found: ${fullUrl}`);
-      res.status(StatusCodes.NOT_FOUND).json({ message: 'Endpoint does not exist' });
+      res.status(StatusCodes.NOT_FOUND).json({ message: `Endpoint ${fullUrl} does not exist` });
       next();
     });
 
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.log('error', `GatewayService: ${error.comingFrom}:`, error);
       if (error instanceof CustomError) {
+        log.log('error', `GatewayService ${error.comingFrom}`, error);
         res.status(error.statusCode).json(error.serializeErrors());
+      }
+
+      if (isAxiosError(error)) {
+        log.log('error', `GatewayService Axios Error - ${error?.response?.data?.comingFrom}:`, error);
+        res
+          .status(error?.response?.status ?? DEFAULT_ERROR_CODE)
+          .json({ message: error?.response?.data?.message ?? 'Error occurred.' });
       }
       next();
     });

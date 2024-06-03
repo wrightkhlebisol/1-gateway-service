@@ -37,6 +37,11 @@ class AuthService {
     return response;
   }
 
+  async verifyEmail(data: { token: string }): Promise<AxiosResponse> {
+    const response: AxiosResponse = await axiosAuthInstance.post('/verify-email', data);
+    return response;
+  }
+
   async signUp(body: IAuth): Promise<AxiosResponse> {
     const response = await this.axiosService.axios.post('/signup', body);
     return response;

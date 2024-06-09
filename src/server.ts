@@ -87,8 +87,8 @@ export class GatewayServer {
     app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
       log.log('error', `GatewayService: ${error.comingFrom}:`, error);
       if (error instanceof CustomError) {
-        log.log('error', `GatewayService ${error.comingFrom}`, error);
-        res.status(error.statusCode).json(error.serializeErrors());
+        res.status(error.statusCode).json(error);
+        return next();
       }
 
       if (isAxiosError(error)) {
@@ -96,8 +96,9 @@ export class GatewayServer {
         res
           .status(error?.response?.status ?? DEFAULT_ERROR_CODE)
           .json({ message: error?.response?.data?.message ?? 'Error occurred.' });
+        return next();
       }
-      next();
+      return next();
     });
   }
 

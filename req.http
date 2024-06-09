@@ -16,5 +16,16 @@ withCredentials: true
   "profilePicture": {{base64Image}}
 }
 
+### GATEWAY AUTH SIGIN
+POST {{gatewayBaseUrl}}/{{gatewayUrlPath}}/auth/signin
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+
+{
+  "username": "Swuntallys",
+  "password": "qwerty"
+}
+
 ### HEALTH ROUTE
 GET {{gatewayBaseUrl}}/gateway-health
